@@ -1,26 +1,30 @@
-# C# Interview Coach
+# NEXUS · C# Interview Studio
 
-A Streamlit chatbot that helps you prepare for C# and .NET interviews. It explains concepts, runs practice interviews, reviews your answers, and tracks a preparation plan. It uses an OpenAI-compatible API for tutor responses, SQLite for local tasks, in-app due alerts, and optional SMTP email reminders.
+A presentation-ready C# and .NET interview preparation workspace built with Streamlit. It combines an API-powered AI tutor, mock interviews, a persistent learning roadmap, technical and behavioral practice, scored quizzes, coding challenges, progress analytics, and optional task-reminder email.
 
-## Features
+## Workspace
 
-- Streaming tutor chat with selectable experience level and target role
-- Practice for C#, .NET, LINQ, async/await, coding, system design, and behavioral interviews
-- SQLite-backed preparation tasks that remain on this computer
-- In-app alerts for overdue tasks and tasks due within 24 hours
-- Optional email reminders sent when you select the reminder button
-- API keys and SMTP passwords loaded from local environment variables
+- **Dashboard:** real task and roadmap totals, overall progress, daily learning-action goal, seven-day activity chart, upcoming tasks, and recent activity.
+- **AI Chat:** streaming C#/.NET tutoring with session-scoped chat history and suggested prompts.
+- **Daily Training:** a dated .NET learning assignment with objectives, a hands-on exercise, completion tracking, and recent lesson history.
+- **Learning Roadmap:** ten milestones with persistent Not started, In progress, and Completed states.
+- **Interview Questions:** technical answer guides, STAR-style behavioral prompts, and beginner/intermediate/advanced scored quizzes.
+- **Coding Practice:** editable C# challenges with a real local .NET compiler/test harness.
+- **Mock Interviews:** separate AI interview sessions; selected behavioral questions carry into the mock room.
+- **Progress Analytics:** persisted learning-action trends, quiz accuracy, roadmap, and task progress.
+- **Settings:** API connection test and email configuration status.
 
 ## Requirements
 
-- Python 3.10 or later
+- Python 3.10 or newer
 - VS Code with the Python extension
-- An OpenAI API key with access to the selected model
-- SMTP account settings only if you want email reminders
+- A Google AI Studio Gemini API key (default model: `gemini-2.5-flash`)
+- .NET 8 SDK for running coding-practice submissions
+- Gmail SMTP credentials if you want scheduled daily assignment emails
 
-## Setup on Windows
+## Windows setup
 
-Open the project folder in VS Code. In the integrated PowerShell terminal, create a virtual environment and install dependencies:
+Open the project folder in VS Code. In the integrated PowerShell terminal, create a virtual environment and install packages:
 
 ```powershell
 py -3.10 -m venv .venv
@@ -28,72 +32,67 @@ py -3.10 -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-If PowerShell blocks activation, use the environment's Python directly:
+If activation is blocked, call the environment's Python directly:
 
 ```powershell
 py -3.10 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-The workspace may already have an `env1` environment. To use it, select `env1\Scripts\python.exe` with **Python: Select Interpreter**, then run:
+To use the existing `env1` environment, select `env1\Scripts\python.exe` with **Python: Select Interpreter**, then run:
 
 ```powershell
 .\env1\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-## Configure the AI API key
+## Configure Google AI Studio
 
-Copy the example environment file and edit the copy:
+Copy the safe example and edit the local copy:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Open `.env` and replace `your_api_key_here` with your API key. Keep the key private. `.env` is ignored by Git and should never be committed. You can also enter the API key in the app's sidebar for the current Streamlit session.
+Create a Gemini API key in [Google AI Studio](https://aistudio.google.com/app/apikey). Set `GEMINI_API_KEY` in `.env`, or enter the key in the app's Settings sidebar for the current session. Never commit or share the real key; `.env` is excluded by `.gitignore`. The default model is `gemini-2.5-flash`; change `GEMINI_MODEL` if needed. API usage is subject to Google's quotas and pricing.
 
-The default model is `gpt-4o-mini`. Change `OPENAI_MODEL` in `.env` or the model field in the sidebar if your API account uses another compatible model. API usage may incur provider charges; check your provider's pricing and limits.
+## Daily training and Gmail notifications
 
-## Optional email reminders
-
-In `.env`, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, and `SMTP_FROM`. Example settings for Gmail are:
+The app rotates through a structured C#/.NET curriculum and creates one stable assignment per date. Its daily Gmail digest includes that lesson plus incomplete tasks that are overdue or due within 24 hours. To enable it, configure `.env`:
 
 ```text
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USERNAME=you@example.com
-SMTP_PASSWORD=your-provider-app-password
+SMTP_PASSWORD=your-google-app-password
 SMTP_FROM=you@example.com
+DAILY_TRAINING_EMAIL=learner@example.com
+DAILY_TRAINING_HOUR=8
+DAILY_TRAINING_MINUTE=0
+DAILY_TRAINING_TIMEZONE=local
 ```
 
-Use an app password or provider-issued SMTP credential, not your normal email password. Email settings are optional. Without them, the in-app overdue and due-soon alerts and task planner still work. Email reminders are sent only when you select **Send due email reminders**; tasks are not emailed automatically in the background. A task needs a reminder email address and must be overdue or due within 24 hours. Successful reminders have a 24-hour cooldown.
+For Gmail, enable 2-Step Verification and create an App Password in Google Account security settings. Use that generated app password in `SMTP_PASSWORD`, not your normal Gmail password. Set `SMTP_USERNAME` and `SMTP_FROM` to the sending account and `DAILY_TRAINING_EMAIL` to the recipient address. The sender and recipient can be the same.
 
-## Run in VS Code
+The schedule uses 24-hour time. `DAILY_TRAINING_TIMEZONE=local` uses the computer's timezone; you may also set an IANA timezone such as `America/New_York`. Restart the app after editing `.env`. The Daily Training and Settings pages show whether scheduling is active, and Settings offers a button to send today's digest immediately. Each date's assignment is sent at most once, and included tasks receive a 24-hour reminder cooldown.
 
-In the integrated terminal, run:
+**The computer and Streamlit server must stay running at the scheduled time.** This scheduler runs inside the app; it cannot send email while the computer is off. To receive messages while the computer is off, deploy the app on an always-on server or configure an external scheduled job. Gmail SMTP uses STARTTLS on port 587; port 465 uses SSL.
+
+Existing task reminders still work: add an email address when creating a task and select **Send due email reminders** when a task is overdue or due within 24 hours.
+
+## Run
+
+In the VS Code terminal:
 
 ```powershell
 streamlit run app.py
 ```
 
-Open the local address Streamlit prints, usually `http://localhost:8501`.
+Open the local URL Streamlit prints, usually `http://localhost:8501`.
 
-## Use the tutor
+## Coding practice setup
 
-1. In the sidebar, enter an API key or configure `OPENAI_API_KEY` in `.env`.
-2. Choose your experience level and target role.
-3. Use a suggested prompt or ask a C#/.NET interview question in the chat.
-4. Open **Preparation plan** to add topics, coding practice, mock interviews, and due dates.
-5. Mark tasks complete as you finish them. The app shows due-soon and overdue alerts.
-6. Configure SMTP and select **Send due email reminders** when you want reminder emails sent.
+Install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) to compile and run challenge submissions. The app creates a temporary console project, runs its tests, and removes that project afterward. Submitted code executes locally without a sandbox; only run code you trust. Without the SDK, the page displays an installation hint and does not fabricate test results.
 
 ## Data and privacy
 
-Task information is stored locally in `data/tutor_tasks.sqlite3`; the `data/` directory is ignored by Git. Chat prompts are sent to the configured AI API provider to generate responses. The app does not store API or SMTP credentials in the task database. Review your provider's data and retention terms before using sensitive information.
-
-## Troubleshooting
-
-- **Missing API key:** Add `OPENAI_API_KEY` to `.env`, or enter the key in the sidebar, then rerun the app.
-- **API authentication/model error:** Verify the key, model name, account access, and provider billing/limits.
-- **Email not configured:** Set all SMTP fields in `.env`, restart Streamlit, and assign an email address to the task.
-- **Email send failure:** Check SMTP host/port, sender permissions, and provider-issued app password. Port 587 uses STARTTLS; port 465 uses SSL.
-- **Tasks are missing:** Keep `data/tutor_tasks.sqlite3`; it is local application data and is intentionally excluded from Git.
+Tasks, daily assignments, reminder status, roadmap status, quiz scores, and learning activity are stored in the local `data/tutor_tasks.sqlite3` database. `data/`, `.env`, and Python environments are excluded from Git. Chat history stays in the active Streamlit session and prompts are sent to Google AI Studio's Gemini API. Review Google's data and retention terms before entering sensitive information.
