@@ -15,3 +15,6 @@ __pycache__/
 chroma/
 chroma_db/
 .chroma/
+
+# Private tutor task database
+data/
