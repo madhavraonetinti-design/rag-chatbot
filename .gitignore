@@ -1,0 +1,17 @@
+# Python environments and generated files
+env1/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Local vector database files
+chroma/
+chroma_db/
+.chroma/
